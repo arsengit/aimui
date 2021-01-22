@@ -208,6 +208,13 @@ function Table(props) {
       >
         {leftPane.length > 0 && (
           <div className='Table__pane Table__pane--left'>
+            {props.groups && (
+              <ConfigColumn
+                data={props.data}
+                expanded={expanded}
+                expand={expand}
+              />
+            )}
             {leftPane.map((col, index) => (
               <Column
                 key={col.key}
@@ -225,7 +232,6 @@ function Table(props) {
                 groups={props.groups}
                 expanded={expanded}
                 expand={expand}
-                showGroupConfig={index === 0}
                 togglePin={togglePin}
                 pinnedTo='left'
               />
@@ -252,7 +258,6 @@ function Table(props) {
               groups={props.groups}
               expanded={expanded}
               expand={expand}
-              showGroupConfig={index === 0 && leftCols.length === 0}
               togglePin={togglePin}
               pinnedTo={null}
             />
@@ -287,9 +292,6 @@ function Table(props) {
                 groups={props.groups}
                 expanded={expanded}
                 expand={expand}
-                showGroupConfig={
-                  index === 0 && rightPane.length === props.columns.length
-                }
                 togglePin={togglePin}
                 pinnedTo='right'
               />
@@ -320,7 +322,6 @@ function Column({
   groups,
   expanded,
   expand,
-  showGroupConfig,
   togglePin,
   pinnedTo,
 }) {
@@ -393,22 +394,6 @@ function Column({
       {groups
         ? Object.keys(data).map((groupKey) => (
           <div key={groupKey} className='Table__group'>
-            <div
-              className={classNames({
-                Table__group__config__cell: true,
-                expanded: expanded[groupKey],
-              })}
-            >
-              {showGroupConfig && (
-                <GroupConfig
-                  config={data[groupKey].config}
-                  expand={expand}
-                  expanded={expanded}
-                  groupKeys={Object.keys(data)}
-                  groupKey={groupKey}
-                />
-              )}
-            </div>
             <Cell
               col={col}
               item={
@@ -444,13 +429,14 @@ function Column({
   );
 }
 
-function Cell({ item, className }) {
+function Cell({ item, className, isConfigColumn }) {
   return (
     <div
       className={classNames({
         Table__cell: true,
         [`${typeof item === 'object' && item.className}`]: true,
         [className]: !!className,
+        Table__group__config__column__cell: isConfigColumn,
         clickable: typeof item === 'object' && !!item.props?.onClick,
       })}
       style={{
@@ -464,9 +450,46 @@ function Cell({ item, className }) {
       }}
       {...(typeof item === 'object' && item.props)}
     >
-      {typeof item === 'object' && item.hasOwnProperty('content')
-        ? item.content
-        : item ?? '-'}
+      {isConfigColumn
+        ? ''
+        : typeof item === 'object' && item.hasOwnProperty('content')
+          ? item.content
+          : item ?? '-'}
+    </div>
+  );
+}
+
+function ConfigColumn({ data, expand, expanded }) {
+  return (
+    <div className='Table__column'>
+      <div className='Table__cell Table__cell--header Table__cell--topHeader'>
+        <UI.Text>Groups</UI.Text>
+      </div>
+      <div className='Table__cell Table__cell--header'>
+        <UI.Text small>Config</UI.Text>
+      </div>
+      {Object.keys(data).map((groupKey) => (
+        <div key={groupKey} className='Table__group'>
+          <div
+            className={classNames({
+              Table__group__config__cell: true,
+              expanded: expanded[groupKey],
+            })}
+          >
+            <GroupConfig
+              config={data[groupKey].config}
+              expand={expand}
+              expanded={expanded}
+              groupKeys={Object.keys(data)}
+              groupKey={groupKey}
+            />
+          </div>
+          {expanded[groupKey] &&
+            data[groupKey].items.map((item, i) => (
+              <Cell key={i} isConfigColumn />
+            ))}
+        </div>
+      ))}
     </div>
   );
 }

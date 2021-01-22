@@ -77,8 +77,9 @@
   display: flex;
   align-items: center;
   background-color: var(--grey-bg);
+  border-right: 1px solid @border-color-dark;
   height: var(--cell-height);
-  padding-bottom: 2px;
+  padding: 0 5px 2px 0;
   box-shadow: inset 0px -1px 0 0 @border-color-dark;
   box-sizing: border-box;
   z-index: 2;
@@ -171,12 +172,18 @@
 
     &.expanded {
       position: sticky;
-      top: calc(3 * var(--cell-height));
+      top: calc(2 * var(--cell-height));
     }
 
     &.expandable:hover {
       background-color: #f3f3f3;
     }
+  }
+
+  &.Table__group__config__column__cell {
+    background-color: var(--grey-bg);
+    border-right: 1px solid @border-color-dark;
+    border-bottom: none;
   }
 
   & > * {
