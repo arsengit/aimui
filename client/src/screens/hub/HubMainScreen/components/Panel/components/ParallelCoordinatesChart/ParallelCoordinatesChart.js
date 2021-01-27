@@ -586,7 +586,7 @@ function ParallelCoordinatesChart(props) {
         .attr('height', 12)
         .attr('width', tickWidth)
         .html((d) => {
-          return `<div style="width: ${tickWidth}px" class='xAxis__text' title=${d}>${d}</div>`;
+          return `<div style='width: ${tickWidth}px' class='xAxis__text' title='${d}'>${d}</div>`;
         });
     });
 
